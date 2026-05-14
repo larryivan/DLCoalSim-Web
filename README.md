@@ -1,14 +1,9 @@
 # DLCoalSim Web
 
-Static Vue browser for DLCoalSim dataset metadata and sample previews.
+Static browser for DLCoalSim dataset metadata and sample previews.
 
-```bash
-npm install
-python3 scripts/build_web_index.py \
-  --dataset-dir /Users/larryivanhan/Desktop/DLCoalSim-10Mb-v1 \
-  --out public/data \
-  --hf-repo Larrivhan/DLCoalSim-10Mb-v1
-npm run dev
-```
+**Live**: https://larryivan.github.io/DLCoalSim-Web/
 
-The site reads small static JSON indexes. Raw shard data stays on Hugging Face.
+**Data**: [Larrivhan/DLCoalSim-10Mb-v1](https://huggingface.co/datasets/Larrivhan/DLCoalSim-10Mb-v1) on Hugging Face
+
+**Stack**: Vue 3 + TypeScript + ECharts + Vite
