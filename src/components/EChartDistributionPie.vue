@@ -25,7 +25,7 @@ const emit = defineEmits<{
   "slice-click": [value: string];
 }>();
 
-const palette = ["#4d6f95", "#6f8fb0", "#527f78", "#8a7aa2", "#9a7561", "#6c7d4f", "#9a6c7a", "#74828d", "#b6c4d0"];
+const palette = ["#466f95", "#7895b5", "#5e857f", "#8a7aa2", "#a17b65", "#6c7d4f", "#9a6c7a", "#758390", "#bac5cf"];
 const el = ref<HTMLDivElement | null>(null);
 let chart: echarts.ECharts | null = null;
 let resizeObserver: ResizeObserver | null = null;
@@ -87,10 +87,10 @@ function renderChart() {
         trigger: "item",
         appendToBody: true,
         confine: true,
-        backgroundColor: "rgba(18, 28, 24, 0.92)",
+        backgroundColor: "rgba(17, 24, 31, 0.94)",
         borderWidth: 0,
         extraCssText: "max-width: 320px; white-space: normal; word-break: break-word;",
-        textStyle: { color: "#f8fbf8" },
+        textStyle: { color: "#f8fafc" },
         formatter: (param: unknown) => {
           const item = param as { name?: string; value?: number; percent?: number };
           return [

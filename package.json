@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "vue-tsc -b && vite build",
+    "build:pages": "GITHUB_PAGES_BASE=/DLCoalSim-Web/ npm run build",
     "preview": "vite preview --host 127.0.0.1",
     "build:index": "python3 scripts/build_web_index.py"
   },

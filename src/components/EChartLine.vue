@@ -91,9 +91,9 @@ function renderChart() {
       tooltip: {
         trigger: "axis",
         axisPointer: { type: props.seriesType === "bar" ? "shadow" : "cross" },
-        backgroundColor: "rgba(18, 28, 24, 0.92)",
+        backgroundColor: "rgba(17, 24, 31, 0.94)",
         borderWidth: 0,
-        textStyle: { color: "#f8fbf8" },
+        textStyle: { color: "#f8fafc" },
         formatter: (params: unknown) => {
           const item = Array.isArray(params) ? params[0] : params;
           const value = (item as { value?: Point }).value;
@@ -121,20 +121,20 @@ function renderChart() {
         name: compact ? "" : props.xName,
         nameLocation: "middle",
         nameGap: 30,
-        axisLine: { lineStyle: { color: "#789086" } },
-        axisLabel: { color: "#5d7068", formatter: fmt, hideOverlap: true, fontSize: compact ? 10 : 11 },
-        splitLine: { lineStyle: { color: "rgba(93,112,104,0.15)" } },
-        minorSplitLine: { show: props.xType === "log", lineStyle: { color: "rgba(93,112,104,0.08)" } },
+        axisLine: { lineStyle: { color: "#9aa8b6" } },
+        axisLabel: { color: "#637385", formatter: fmt, hideOverlap: true, fontSize: compact ? 10 : 11 },
+        splitLine: { lineStyle: { color: "rgba(99,115,133,0.14)" } },
+        minorSplitLine: { show: props.xType === "log", lineStyle: { color: "rgba(99,115,133,0.08)" } },
       },
       yAxis: {
         type: props.yType,
         name: compact ? "" : props.yName,
         nameLocation: "middle",
         nameGap: 48,
-        axisLine: { lineStyle: { color: "#789086" } },
-        axisLabel: { color: "#5d7068", formatter: fmt, hideOverlap: true, fontSize: compact ? 10 : 11 },
-        splitLine: { lineStyle: { color: "rgba(93,112,104,0.15)" } },
-        minorSplitLine: { show: props.yType === "log", lineStyle: { color: "rgba(93,112,104,0.08)" } },
+        axisLine: { lineStyle: { color: "#9aa8b6" } },
+        axisLabel: { color: "#637385", formatter: fmt, hideOverlap: true, fontSize: compact ? 10 : 11 },
+        splitLine: { lineStyle: { color: "rgba(99,115,133,0.14)" } },
+        minorSplitLine: { show: props.yType === "log", lineStyle: { color: "rgba(99,115,133,0.08)" } },
       },
       dataZoom: hasZoom
         ? [
@@ -144,9 +144,9 @@ function renderChart() {
               xAxisIndex: 0,
               bottom: 16,
               height: 18,
-              borderColor: "rgba(23,32,27,0.14)",
+              borderColor: "rgba(23,33,43,0.14)",
               backgroundColor: "rgba(255,255,255,0.75)",
-              fillerColor: "rgba(47,125,109,0.18)",
+              fillerColor: "rgba(47,95,134,0.18)",
               handleStyle: { color: props.color },
             },
           ]
