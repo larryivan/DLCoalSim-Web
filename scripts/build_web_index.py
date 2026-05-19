@@ -260,12 +260,18 @@ def main():
     parser.add_argument("--out", default="public/data")
     parser.add_argument("--dataset-id", default="DLCoalSim-10Mb-v1")
     parser.add_argument("--hf-repo", default="Larrivhan/DLCoalSim-10Mb-v1")
+    parser.add_argument("--detail-out", default=None, help="write heavy detail chunks here instead of under --out")
+    parser.add_argument("--detail-url-base", default=None, help="absolute URL prefix for detail chunks")
+    parser.add_argument("--detail-chunk-size", type=int, default=512)
     args = parser.parse_args()
 
     dataset_dir = Path(args.dataset_dir)
     out_dir = Path(args.out)
     dataset_out = out_dir / args.dataset_id
     dataset_out.mkdir(parents=True, exist_ok=True)
+    detail_root = Path(args.detail_out) if args.detail_out else dataset_out
+    details_dir = detail_root / "details"
+    details_dir.mkdir(parents=True, exist_ok=True)
 
     manifest = json.loads((dataset_dir / "manifest.json").read_text())
     rows = read_metadata(dataset_dir / "metadata" / "samples.csv")
@@ -282,14 +288,12 @@ def main():
         detail_samples.append(sample)
     detail_samples.sort(key=lambda item: item["sample_id"])
 
-    chunk_size = 512
-    details_dir = dataset_out / "details"
-    details_dir.mkdir(exist_ok=True)
     index_samples = []
-    for chunk_id, start in enumerate(range(0, len(detail_samples), chunk_size)):
-        chunk = detail_samples[start : start + chunk_size]
+    detail_url_base = args.detail_url_base.rstrip("/") if args.detail_url_base else ""
+    for chunk_id, start in enumerate(range(0, len(detail_samples), args.detail_chunk_size)):
+        chunk = detail_samples[start : start + args.detail_chunk_size]
         detail_file = f"details/detail_{chunk_id:05d}.json"
-        (dataset_out / detail_file).write_text(json.dumps(chunk, separators=(",", ":")) + "\n")
+        (detail_root / detail_file).write_text(json.dumps(chunk, separators=(",", ":")) + "\n")
         for detail_index, sample in enumerate(chunk):
             index_row = {field: sample[field] for field in INDEX_FIELDS}
             index_row["detail_file"] = detail_file
@@ -317,6 +321,7 @@ def main():
                 "sample_files_human": manifest_storage_human(manifest),
                 "hf_repo": args.hf_repo,
                 "hf_url": f"https://huggingface.co/datasets/{args.hf_repo}",
+                "detail_base_url": detail_url_base or "",
                 "index_path": f"data/{args.dataset_id}/samples.json",
                 "detail_path": f"data/{args.dataset_id}/dataset.json",
             }

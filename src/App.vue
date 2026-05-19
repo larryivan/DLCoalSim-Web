@@ -256,6 +256,14 @@ function distributionHeight(key: string | number) {
   return String(key) === "demography_type" ? 330 : 305;
 }
 
+function detailChunkPath(row: SampleIndexRow) {
+  if (!dataset.value) return row.detail_file;
+  if (/^https?:\/\//i.test(row.detail_file)) return row.detail_file;
+  const detailBase = dataset.value.detail_base_url;
+  if (detailBase) return `${detailBase.replace(/\/$/, "")}/${row.detail_file.replace(/^\//, "")}`;
+  return `${import.meta.env.BASE_URL}data/${dataset.value.id}/${row.detail_file}`;
+}
+
 async function openDataset(item: DatasetSummary, options: { resetControls?: boolean } = {}) {
   loading.value = true;
   error.value = "";
@@ -293,7 +301,7 @@ async function openSample(row: SampleIndexRow) {
   detailLoading.value = true;
   error.value = "";
   try {
-    const path = `${import.meta.env.BASE_URL}data/${dataset.value.id}/${row.detail_file}`;
+    const path = detailChunkPath(row);
     let chunk = detailCache.get(row.detail_file);
     if (!chunk) {
       chunk = await loadJson<SampleDetailRow[]>(path);

@@ -9,6 +9,7 @@ export type DatasetSummary = {
   sample_files_human: string;
   hf_repo: string;
   hf_url: string;
+  detail_base_url?: string;
   index_path: string;
   detail_path: string;
 };
