@@ -111,8 +111,19 @@ def read_metadata(path):
     return rows
 
 
+def sample_shard_paths(samples_dir):
+    def keep(path):
+        rel = path.relative_to(samples_dir)
+        return not any(part.startswith(".") or part.startswith("_") for part in rel.parts)
+
+    return sorted(
+        (path for path in samples_dir.rglob("*.npz") if keep(path)),
+        key=lambda path: path.relative_to(samples_dir).as_posix(),
+    )
+
+
 def add_targets(rows, samples_dir):
-    for shard_path in sorted(samples_dir.glob("*.npz")):
+    for shard_path in sample_shard_paths(samples_dir):
         with np.load(shard_path, allow_pickle=False) as data:
             sample_ids = data["sample_id"].astype(str)
             targets = data["target_log10_ne"]
@@ -215,6 +226,34 @@ def numeric_ranges(samples):
     return result
 
 
+def manifest_value(manifest, key, default=None):
+    if key in manifest:
+        return manifest[key]
+    samples = manifest.get("samples")
+    if isinstance(samples, dict) and key in samples:
+        return samples[key]
+    return default
+
+
+def manifest_storage_human(manifest):
+    storage = manifest.get("storage")
+    if isinstance(storage, dict) and storage.get("sample_files_human"):
+        return storage["sample_files_human"]
+    samples = manifest.get("samples")
+    if isinstance(samples, dict):
+        storage = samples.get("storage")
+        if isinstance(storage, dict) and storage.get("sample_files_human"):
+            return storage["sample_files_human"]
+        if samples.get("samples_gb") is not None:
+            return f"{float(samples['samples_gb']):.2f} GB"
+    return ""
+
+
+def hf_sample_path(path):
+    value = str(path or "").replace("\\", "/")
+    return value.removeprefix("samples/")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset-dir", default="/Users/larryivanhan/Desktop/DLCoalSim-10Mb-v1")
@@ -236,8 +275,8 @@ def main():
     detail_samples = []
     for sample in rows.values():
         sample.setdefault("target_log10_ne", [])
-        shard_file = sample["shard_file"]
-        shard_meta = sample["shard_metadata_file"]
+        shard_file = hf_sample_path(sample["shard_file"])
+        shard_meta = hf_sample_path(sample["shard_metadata_file"])
         sample["hf_shard_url"] = f"{hf_base}/samples/{shard_file}"
         sample["hf_metadata_url"] = f"{hf_base}/samples/{shard_meta}"
         detail_samples.append(sample)
@@ -270,12 +309,12 @@ def main():
             {
                 "id": args.dataset_id,
                 "name": args.dataset_id,
-                "n_samples": manifest["n_samples"],
-                "n_shards": manifest["n_shards"],
-                "sequence_length_bp": manifest["sequence_length_bp"],
-                "n_haplotypes": manifest["n_haplotypes"],
-                "time_bins": manifest["time_bins"],
-                "sample_files_human": manifest["storage"]["sample_files_human"],
+                "n_samples": manifest_value(manifest, "n_samples", len(detail_samples)),
+                "n_shards": manifest_value(manifest, "n_shards", 0),
+                "sequence_length_bp": manifest_value(manifest, "sequence_length_bp", 0),
+                "n_haplotypes": manifest_value(manifest, "n_haplotypes", 0),
+                "time_bins": manifest_value(manifest, "time_bins", 0),
+                "sample_files_human": manifest_storage_human(manifest),
                 "hf_repo": args.hf_repo,
                 "hf_url": f"https://huggingface.co/datasets/{args.hf_repo}",
                 "index_path": f"data/{args.dataset_id}/samples.json",
